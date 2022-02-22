@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <modules>
+        <module>kafka-postgres-writer</module>
+        <module>kafka-postgres-avro</module>
+        <module>kafka-postgres-reader</module>
+    </modules>
+
+    <groupId>ru.datamart.connector</groupId>
+    <artifactId>kafka-postgres-connector-parent</artifactId>
+    <version>0.1.8</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <vertx.version>4.1.2</vertx.version>
+        <junit.version>5.7.2</junit.version>
+        <apache.commons.lang.version>3.12.0</apache.commons.lang.version>
+        <guava.version>28.2-jre</guava.version>
+        <logback.version>1.2.3</logback.version>
+        <avro.version>1.9.2</avro.version>
+        <lombok.version>1.18.20</lombok.version>
+        <spring.version>2.5.2</spring.version>
+    </properties>
+
+    <dependencies>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8</version>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
