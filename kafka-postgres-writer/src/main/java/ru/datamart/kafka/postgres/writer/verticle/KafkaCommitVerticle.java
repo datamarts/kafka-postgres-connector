@@ -17,13 +17,6 @@ package ru.datamart.kafka.postgres.writer.verticle;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import ru.datamart.kafka.postgres.writer.configuration.properties.VerticleProperties;
-import ru.datamart.kafka.postgres.writer.factory.InsertRequestFactory;
-import ru.datamart.kafka.postgres.writer.model.DataTopic;
-import ru.datamart.kafka.postgres.writer.model.InsertDataContext;
-import ru.datamart.kafka.postgres.writer.model.kafka.PartitionOffset;
-import ru.datamart.kafka.postgres.writer.model.kafka.TopicPartitionConsumer;
-import ru.datamart.kafka.postgres.writer.service.kafka.KafkaConsumerService;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.jackson.DatabindCodec;
@@ -32,6 +25,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import ru.datamart.kafka.postgres.writer.configuration.properties.VerticleProperties;
+import ru.datamart.kafka.postgres.writer.factory.InsertRequestFactory;
+import ru.datamart.kafka.postgres.writer.model.DataTopic;
+import ru.datamart.kafka.postgres.writer.model.InsertDataContext;
+import ru.datamart.kafka.postgres.writer.model.kafka.PartitionOffset;
+import ru.datamart.kafka.postgres.writer.model.kafka.TopicPartitionConsumer;
+import ru.datamart.kafka.postgres.writer.service.kafka.KafkaConsumerService;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -81,25 +81,30 @@ public class KafkaCommitVerticle extends ConfigurableVerticle {
             return;
         }
 
-        timerId = vertx.setPeriodic(1000, timer -> {
-            List<PartitionOffset> byCommit = new ArrayList<>();
-            while (!offsetsQueue.isEmpty()) {
-                PartitionOffset offset = offsetsQueue.poll();
-                if (offset != null) {
-                    byCommit.add(offset);
-                } else {
-                    break;
-                }
+        timerId = vertx.setPeriodic(1000, timer -> commitOffsets());
+    }
+
+    private void commitOffsets() {
+        List<PartitionOffset> byCommit = new ArrayList<>();
+        while (!offsetsQueue.isEmpty()) {
+            PartitionOffset offset = offsetsQueue.poll();
+            if (offset != null) {
+                byCommit.add(offset);
+            } else {
+                break;
             }
-            List<PartitionOffset> notExistsConsumers = commitKafkaMessages(byCommit);
-            offsetsQueue.addAll(notExistsConsumers);
-        });
+        }
+        List<PartitionOffset> notExistsConsumers = commitKafkaMessages(byCommit);
+        offsetsQueue.addAll(notExistsConsumers);
     }
 
     @Override
     public void stop() {
         stopped = true;
         vertx.cancelTimer(timerId);
+        if (!offsetsQueue.isEmpty()) {
+            commitOffsets();
+        }
     }
 
     private List<PartitionOffset> commitKafkaMessages(List<PartitionOffset> partitionOffsets) {
