@@ -1,3 +1,5 @@
+Project is in active development and has been moved to https://repository.datamart.ru/datamarts/kafka-postgres-connector
+
 # kafka-postgres-connector
 A supporting service to the [Prostore main service](https://github.com/datamarts/prostore) `dtm-query-execution-core` that
 communicates with the respective DBMS.
